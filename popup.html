@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #09090b;
+      color: #fafafa;
+      padding: 16px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon {
+      width: 28px;
+      height: 28px;
+      color: #a78bfa;
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fafafa;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 6px;
+      background: rgba(167, 139, 250, 0.15);
+      color: #a78bfa;
+      border-radius: 4px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #71717a;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      color: #fafafa;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+
+    select:focus { border-color: #a78bfa; }
+    select:hover { border-color: #3f3f46; }
+
+    .model-meta {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #18181b;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #a1a1aa;
+    }
+
+    .model-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .model-meta-item .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .model-meta-item .dot.openai { background: #10b981; }
+    .model-meta-item .dot.anthropic { background: #f59e0b; }
+    .model-meta-item .dot.gemini { background: #3b82f6; }
+    .model-meta-item .dot.xai { background: #6b7280; }
+    .model-meta-item .dot.mystery { background: #8b5cf6; }
+
+    .effort-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .effort-btn {
+      flex: 1;
+      padding: 6px 0;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      color: #71717a;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .effort-btn:hover {
+      border-color: #3f3f46;
+      color: #d4d4d8;
+    }
+
+    .effort-btn.active {
+      background: rgba(167, 139, 250, 0.12);
+      border-color: rgba(167, 139, 250, 0.3);
+      color: #a78bfa;
+    }
+
+    .divider {
+      height: 1px;
+      background: #27272a;
+      margin: 16px 0;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .row-item {
+      flex: 1;
+      padding: 10px;
+      background: #18181b;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .row-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fafafa;
+    }
+
+    .row-label {
+      font-size: 10px;
+      color: #52525b;
+      margin-top: 2px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      background: #18181b;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    .status-dot.off {
+      background: #ef4444;
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: #71717a;
+    }
+
+    .reset {
+      width: 100%;
+      padding: 8px;
+      background: transparent;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      color: #52525b;
+      font-size: 11px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .reset:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .bars {
+      display: flex;
+      gap: 3px;
+      margin-top: 4px;
+    }
+
+    .bar {
+      width: 4px;
+      height: 12px;
+      background: #27272a;
+      border-radius: 2px;
+    }
+
+    .bar.on { background: #a78bfa; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 3a9 9 0 0 1 9 9"/>
+      </svg>
+      <span class="title">Notion AI</span>
+    </div>
+    <span class="badge">v1.0</span>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Model</label>
+    <select id="model-select"></select>
+    <div class="model-meta" id="model-meta">
+      <div class="model-meta-item">
+        <div class="dot" id="family-dot"></div>
+        <span id="family-name">-</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Reasoning Effort</label>
+    <div class="effort-group" id="effort-group">
+      <button class="effort-btn" data-effort="low">Low</button>
+      <button class="effort-btn" data-effort="medium">Med</button>
+      <button class="effort-btn" data-effort="high">High</button>
+      <button class="effort-btn" data-effort="max">Max</button>
+    </div>
+    <div style="margin-top: 8px;">
+      <div style="display: flex; gap: 12px;">
+        <div>
+          <div class="field-label" style="margin-bottom: 4px;">Speed</div>
+          <div class="bars" id="bars-speed"></div>
+        </div>
+        <div>
+          <div class="field-label" style="margin-bottom: 4px;">Intelligence</div>
+          <div class="bars" id="bars-intel"></div>
+        </div>
+        <div>
+          <div class="field-label" style="margin-bottom: 4px;">Cost</div>
+          <div class="bars" id="bars-cost"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="row">
+    <div class="row-item">
+      <div class="row-value" id="stat-requests">0</div>
+      <div class="row-label">Intercepted</div>
+    </div>
+    <div class="row-item">
+      <div class="row-value" id="stat-swaps">0</div>
+      <div class="row-label">Swapped</div>
+    </div>
+  </div>
+
+  <div class="status">
+    <div class="status-dot" id="status-dot"></div>
+    <span class="status-text" id="status-text">Checking...</span>
+  </div>
+
+  <button class="reset" id="reset-btn">Reset to default</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Notion AI Effort Control",
+  "version": "1.0",
+  "description": "Control AI model and reasoning effort in Notion",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["https://app.notion.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["inject.js"],
+      "matches": ["https://app.notion.com/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://app.notion.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
