@@ -14,11 +14,12 @@
   injectScript();
 
   function loadAndSendSettings() {
-    chrome.storage.local.get(["selectedModel", "selectedEffort"], (data) => {
+    chrome.storage.local.get(["selectedModel", "selectedEffort", "modelEfforts"], (data) => {
       window.postMessage({
         type: 'NOTION_EFFORT_SETTINGS',
         model: data.selectedModel || null,
-        effort: data.selectedEffort || null
+        effort: data.selectedEffort || null,
+        modelEfforts: data.modelEfforts || {}
       }, '*');
     });
   }
@@ -34,7 +35,8 @@
       window.postMessage({
         type: 'NOTION_EFFORT_SETTINGS',
         model: msg.model || null,
-        effort: msg.effort || null
+        effort: msg.effort || null,
+        modelEfforts: msg.modelEfforts || {}
       }, '*');
       sendResponse({ ok: true });
       return true;

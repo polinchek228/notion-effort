@@ -26,10 +26,27 @@ const MODELS = [
   { model: "baseten-glm-5.2", name: "GLM 5.2", family: "mystery", efforts: [], speed: 3, intelligence: 5, cost: 3 },
 ];
 
+function iconPath(file) { return chrome.runtime.getURL("icons/" + file); }
+
+const FAMILY_ICONS = {
+  openai:    (id) => `<img src="${iconPath("family-openai.png")}" width="16" height="16" style="border-radius:2px">`,
+  anthropic: (id) => `<img src="${iconPath("family-anthropic.png")}" width="16" height="16" style="border-radius:2px">`,
+  gemini:    (id) => `<img src="${iconPath("family-gemini.png")}" width="16" height="16" style="border-radius:2px">`,
+  xai:       (id) => `<img src="${iconPath("family-grok.png")}" width="16" height="16" style="border-radius:2px">`,
+  mystery:   (id) => `<img src="${iconPath("family-deepseek.png")}" width="16" height="16" style="border-radius:2px">`
+};
+
+let selectedModel = "almond-croissant-low";
 let currentEffort = "medium";
+let activePreset = null;
+let menuOpen = false;
 
 function init() {
-  const modelSelect = document.getElementById("model-select");
+  const dropdown = document.getElementById("dropdown");
+  const trigger = document.getElementById("dropdown-trigger");
+  const triggerIcon = document.getElementById("trigger-icon");
+  const triggerName = document.getElementById("trigger-name");
+  const menu = document.getElementById("dropdown-menu");
   const familyDot = document.getElementById("family-dot");
   const familyName = document.getElementById("family-name");
   const effortGroup = document.getElementById("effort-group");
@@ -42,14 +59,62 @@ function init() {
   const statSwaps = document.getElementById("stat-swaps");
   const resetBtn = document.getElementById("reset-btn");
 
-  if (!modelSelect) return;
-
   MODELS.forEach(m => {
-    const opt = document.createElement("option");
-    opt.value = m.model;
-    opt.textContent = m.name + (m.restricted ? " *" : "");
-    modelSelect.appendChild(opt);
+    const item = document.createElement("div");
+    item.className = "dropdown-item" + (m.model === selectedModel ? " selected" : "");
+    item.dataset.model = m.model;
+    item.innerHTML = `
+      <span class="family-icon">${(FAMILY_ICONS[m.family] && FAMILY_ICONS[m.family]()) || ""}</span>
+      <span class="model-name">${m.name}</span>
+      ${m.restricted ? '<span class="restricted">*</span>' : ""}
+    `;
+    item.addEventListener("click", () => selectModel(m.model));
+    menu.appendChild(item);
   });
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    menuOpen = !menuOpen;
+    menu.classList.toggle("open", menuOpen);
+    trigger.classList.toggle("open", menuOpen);
+  });
+
+  document.addEventListener("click", () => {
+    menuOpen = false;
+    menu.classList.remove("open");
+    trigger.classList.remove("open");
+  });
+
+  menu.addEventListener("click", (e) => e.stopPropagation());
+
+  function selectModel(model) {
+    selectedModel = model;
+    menu.querySelectorAll(".dropdown-item").forEach(item => {
+      item.classList.toggle("selected", item.dataset.model === model);
+    });
+    const m = MODELS.find(x => x.model === model);
+    if (m) {
+      triggerIcon.innerHTML = (FAMILY_ICONS[m.family] && FAMILY_ICONS[m.family]()) || "";
+      triggerName.textContent = m.name;
+      if (familyDot) familyDot.className = "dot " + m.family;
+      if (familyName) familyName.textContent = m.family;
+      renderBars(barsSpeed, m.speed);
+      renderBars(barsIntel, m.intelligence);
+      renderBars(barsCost, m.cost);
+      document.querySelectorAll(".effort-btn").forEach(btn => {
+        const e = btn.dataset.effort;
+        const ok = m.efforts.length === 0 || m.efforts.includes(e);
+        btn.style.opacity = ok ? "1" : "0.3";
+        btn.style.pointerEvents = ok ? "auto" : "none";
+        btn.classList.toggle("active", e === currentEffort);
+      });
+    }
+    menuOpen = false;
+    menu.classList.remove("open");
+    trigger.classList.remove("open");
+    chrome.storage.local.set({ selectedModel: model });
+    notify();
+  }
 
   function renderBars(container, value) {
     if (!container) return;
@@ -61,30 +126,16 @@ function init() {
     }
   }
 
-  function update() {
-    const m = MODELS.find(x => x.model === modelSelect.value);
-    if (!m) return;
-    if (familyDot) familyDot.className = "dot " + m.family;
-    if (familyName) familyName.textContent = m.family;
-    renderBars(barsSpeed, m.speed);
-    renderBars(barsIntel, m.intelligence);
-    renderBars(barsCost, m.cost);
-    document.querySelectorAll(".effort-btn").forEach(btn => {
-      const e = btn.dataset.effort;
-      const ok = m.efforts.length === 0 || m.efforts.includes(e);
-      btn.style.opacity = ok ? "1" : "0.3";
-      btn.style.pointerEvents = ok ? "auto" : "none";
-      btn.classList.toggle("active", e === currentEffort);
-    });
-  }
-
   function notify() {
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      if (!tabs[0]) return;
-      chrome.tabs.sendMessage(tabs[0].id, {
-        type: "UPDATE_SETTINGS",
-        model: modelSelect.value,
-        effort: currentEffort
+    chrome.storage.local.get(["modelEfforts"], (data) => {
+      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        if (!tabs[0]) return;
+        chrome.tabs.sendMessage(tabs[0].id, {
+          type: "UPDATE_SETTINGS",
+          model: selectedModel,
+          effort: currentEffort,
+          modelEfforts: data.modelEfforts || {}
+        });
       });
     });
   }
@@ -104,21 +155,19 @@ function init() {
     });
   }
 
-  chrome.storage.local.get(["selectedModel", "selectedEffort", "stats"], data => {
-    if (data.selectedModel) modelSelect.value = data.selectedModel;
+  chrome.storage.local.get(["selectedModel", "selectedEffort", "activePreset", "stats"], data => {
+    if (data.selectedModel) selectedModel = data.selectedModel;
     if (data.selectedEffort) currentEffort = data.selectedEffort;
+    if (data.activePreset) {
+      activePreset = data.activePreset;
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.toggle("active", b.dataset.preset === activePreset));
+    }
     if (data.stats) {
       if (statRequests) statRequests.textContent = data.stats.requests || 0;
       if (statSwaps) statSwaps.textContent = data.stats.swaps || 0;
     }
-    update();
+    selectModel(selectedModel);
     checkStatus();
-  });
-
-  modelSelect.addEventListener("change", () => {
-    chrome.storage.local.set({ selectedModel: modelSelect.value });
-    update();
-    notify();
   });
 
   if (effortGroup) {
@@ -126,19 +175,61 @@ function init() {
       const btn = e.target.closest(".effort-btn");
       if (!btn || btn.style.pointerEvents === "none") return;
       currentEffort = btn.dataset.effort;
+      activePreset = null;
       document.querySelectorAll(".effort-btn").forEach(b => b.classList.toggle("active", b === btn));
-      chrome.storage.local.set({ selectedEffort: currentEffort });
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+      chrome.storage.local.set({ selectedEffort: currentEffort, activePreset: null, modelEfforts: {} });
+      notify();
+    });
+  }
+
+  const presetGroup = document.getElementById("preset-group");
+  if (presetGroup) {
+    presetGroup.addEventListener("click", e => {
+      const btn = e.target.closest(".preset-btn");
+      if (!btn) return;
+      const preset = btn.dataset.preset;
+      activePreset = preset;
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.toggle("active", b === btn));
+
+      const modelEfforts = {};
+      MODELS.forEach(m => {
+        if (m.efforts.length === 0) { modelEfforts[m.model] = null; return; }
+        switch (preset) {
+          case "max":
+            modelEfforts[m.model] = m.efforts.includes("max") ? "max" : m.efforts[m.efforts.length - 1];
+            break;
+          case "high":
+            modelEfforts[m.model] = m.efforts.includes("high") ? "high" : m.efforts[m.efforts.length - 1];
+            break;
+          case "balanced":
+            modelEfforts[m.model] = m.efforts.includes("medium") ? "medium" : m.efforts[0];
+            break;
+          case "low":
+            modelEfforts[m.model] = m.efforts.includes("low") ? "low" : m.efforts[0];
+            break;
+        }
+      });
+
+      const currentModelEffort = modelEfforts[selectedModel];
+      if (currentModelEffort) {
+        currentEffort = currentModelEffort;
+        document.querySelectorAll(".effort-btn").forEach(b => b.classList.toggle("active", b.dataset.effort === currentEffort));
+      }
+
+      chrome.storage.local.set({ activePreset: preset, modelEfforts, selectedEffort: currentEffort });
       notify();
     });
   }
 
   if (resetBtn) {
     resetBtn.addEventListener("click", () => {
-      chrome.storage.local.remove(["selectedModel", "selectedEffort"], () => {
-        modelSelect.value = "almond-croissant-low";
+      chrome.storage.local.remove(["selectedModel", "selectedEffort", "modelEfforts", "activePreset"], () => {
         currentEffort = "medium";
-        update();
-        notify();
+        activePreset = null;
+        document.querySelectorAll(".effort-btn").forEach(b => b.classList.toggle("active", b.dataset.effort === "medium"));
+        document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+        selectModel("almond-croissant-low");
       });
     });
   }

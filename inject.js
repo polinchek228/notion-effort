@@ -3,13 +3,14 @@
 
   let interceptedCount = 0;
   let swappedCount = 0;
-  let settings = { model: null, effort: null };
+  let settings = { model: null, effort: null, modelEfforts: {} };
 
   window.addEventListener('message', (e) => {
     if (e.source !== window) return;
     if (e.data && e.data.type === 'NOTION_EFFORT_SETTINGS') {
       settings.model = e.data.model || null;
       settings.effort = e.data.effort || null;
+      settings.modelEfforts = e.data.modelEfforts || {};
     }
     if (e.data && e.data.type === 'NOTION_EFFORT_PING') {
       window.postMessage({
@@ -49,9 +50,14 @@
           configStep.value.model = settings.model;
           modified = true;
         }
-        if (settings.effort && configStep.value.reasoningEffort !== undefined) {
-          if (configStep.value.reasoningEffort !== settings.effort) {
-            configStep.value.reasoningEffort = settings.effort;
+
+        const activeModel = settings.model || configStep.value.model;
+        const perModelEffort = settings.modelEfforts[activeModel];
+        const targetEffort = perModelEffort || settings.effort;
+
+        if (targetEffort && configStep.value.reasoningEffort !== undefined) {
+          if (configStep.value.reasoningEffort !== targetEffort) {
+            configStep.value.reasoningEffort = targetEffort;
             modified = true;
           }
         }
