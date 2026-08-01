@@ -149,18 +149,25 @@
     .bar { width: 4px; height: 12px; background: #27272a; border-radius: 2px; }
     .bar.on { background: #a78bfa; }
 
-    .preset-group { display: flex; gap: 4px; }
-    .preset-btn {
-      flex: 1; padding: 6px 0; background: #18181b; border: 1px solid #27272a;
-      border-radius: 6px; color: #71717a; font-size: 10px; font-weight: 500;
-      font-family: inherit; cursor: pointer; transition: all 0.15s;
+    .pipeline-section { margin-top: 12px; }
+
+    .toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background: #27272a; border-radius: 20px; transition: 0.2s;
     }
-    .preset-btn:hover { border-color: #3f3f46; color: #d4d4d8; }
-    .preset-btn.active {
-      background: rgba(239, 68, 68, 0.12);
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #ef4444;
+    .toggle-slider:before {
+      content: ""; position: absolute; height: 14px; width: 14px;
+      left: 3px; bottom: 3px; background: #52525b; border-radius: 50%; transition: 0.2s;
     }
+    .toggle input:checked + .toggle-slider { background: rgba(167, 139, 250, 0.3); }
+    .toggle input:checked + .toggle-slider:before { transform: translateX(16px); background: #a78bfa; }
+    .toggle-label { font-size: 11px; color: #a1a1aa; margin-left: 8px; vertical-align: middle; }
+
+    .pipeline-row { display: flex; gap: 6px; margin-top: 8px; }
+    .pipeline-col { flex: 1; }
+    .pipeline-col .field-label { font-size: 10px; }
   </style>
 </head>
 <body>
@@ -218,6 +225,47 @@
       <button class="preset-btn" data-preset="high">High</button>
       <button class="preset-btn" data-preset="balanced">Balanced</button>
       <button class="preset-btn" data-preset="low">Low</button>
+    </div>
+  </div>
+
+  <div class="pipeline-section">
+    <div class="field">
+      <label class="field-label">Pipeline Mode</label>
+      <label class="toggle">
+        <input type="checkbox" id="pipeline-toggle">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">Model 1 → Model 2</span>
+      <div id="pipeline-models" style="display:none;">
+        <div class="pipeline-row">
+          <div class="pipeline-col">
+            <div class="field" style="margin-bottom: 6px;">
+              <label class="field-label">Model 1 (first pass)</label>
+              <div class="dropdown" id="pipeline-dropdown-1">
+                <div class="dropdown-trigger" id="pipeline-trigger-1">
+                  <span id="pipeline-trigger-icon-1"></span>
+                  <span id="pipeline-trigger-name-1">-</span>
+                  <span class="arrow">▾</span>
+                </div>
+                <div class="dropdown-menu" id="pipeline-menu-1"></div>
+              </div>
+            </div>
+          </div>
+          <div class="pipeline-col">
+            <div class="field" style="margin-bottom: 6px;">
+              <label class="field-label">Model 2 (final)</label>
+              <div class="dropdown" id="pipeline-dropdown-2">
+                <div class="dropdown-trigger" id="pipeline-trigger-2">
+                  <span id="pipeline-trigger-icon-2"></span>
+                  <span id="pipeline-trigger-name-2">-</span>
+                  <span class="arrow">▾</span>
+                </div>
+                <div class="dropdown-menu" id="pipeline-menu-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

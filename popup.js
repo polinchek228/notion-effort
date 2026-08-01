@@ -42,6 +42,11 @@ let selectedModel = "almond-croissant-low";
 let currentEffort = "medium";
 let activePreset = null;
 let menuOpen = false;
+let pipelineEnabled = false;
+let pipelineModel1 = "gingerbread";
+let pipelineModel2 = "almond-croissant-low";
+let pipelineMenuOpen1 = false;
+let pipelineMenuOpen2 = false;
 
 function init() {
   const dropdown = document.getElementById("dropdown");
@@ -60,6 +65,16 @@ function init() {
   const statRequests = document.getElementById("stat-requests");
   const statSwaps = document.getElementById("stat-swaps");
   const resetBtn = document.getElementById("reset-btn");
+  const pipelineToggle = document.getElementById("pipeline-toggle");
+  const pipelineModels = document.getElementById("pipeline-models");
+  const pipelineTrigger1 = document.getElementById("pipeline-trigger-1");
+  const pipelineTrigger2 = document.getElementById("pipeline-trigger-2");
+  const pipelineMenu1 = document.getElementById("pipeline-menu-1");
+  const pipelineMenu2 = document.getElementById("pipeline-menu-2");
+  const pipelineName1 = document.getElementById("pipeline-trigger-name-1");
+  const pipelineName2 = document.getElementById("pipeline-trigger-name-2");
+  const pipelineIcon1 = document.getElementById("pipeline-trigger-icon-1");
+  const pipelineIcon2 = document.getElementById("pipeline-trigger-icon-2");
 
   MODELS.forEach(m => {
     const item = document.createElement("div");
@@ -74,6 +89,62 @@ function init() {
     menu.appendChild(item);
   });
 
+  MODELS.forEach(m => {
+    const item1 = document.createElement("div");
+    item1.className = "dropdown-item" + (m.model === pipelineModel1 ? " selected" : "");
+    item1.dataset.model = m.model;
+    item1.innerHTML = `
+      <span class="family-icon">${(FAMILY_ICONS[m.family] && FAMILY_ICONS[m.family]()) || ""}</span>
+      <span class="model-name">${m.name}</span>
+    `;
+    item1.addEventListener("click", () => selectPipelineModel(1, m.model));
+    pipelineMenu1.appendChild(item1);
+
+    const item2 = document.createElement("div");
+    item2.className = "dropdown-item" + (m.model === pipelineModel2 ? " selected" : "");
+    item2.dataset.model = m.model;
+    item2.innerHTML = `
+      <span class="family-icon">${(FAMILY_ICONS[m.family] && FAMILY_ICONS[m.family]()) || ""}</span>
+      <span class="model-name">${m.name}</span>
+    `;
+    item2.addEventListener("click", () => selectPipelineModel(2, m.model));
+    pipelineMenu2.appendChild(item2);
+  });
+
+  if (pipelineToggle) {
+    pipelineToggle.checked = pipelineEnabled;
+    if (pipelineModels) pipelineModels.style.display = pipelineEnabled ? "block" : "none";
+    pipelineToggle.addEventListener("change", () => {
+      pipelineEnabled = pipelineToggle.checked;
+      if (pipelineModels) pipelineModels.style.display = pipelineEnabled ? "block" : "none";
+      notify();
+    });
+  }
+
+  if (pipelineTrigger1) {
+    pipelineTrigger1.addEventListener("click", (e) => {
+      e.stopPropagation();
+      pipelineMenuOpen1 = !pipelineMenuOpen1;
+      pipelineMenu1.classList.toggle("open", pipelineMenuOpen1);
+      pipelineTrigger1.classList.toggle("open", pipelineMenuOpen1);
+      if (pipelineMenu2) pipelineMenu2.classList.remove("open");
+      pipelineMenuOpen2 = false;
+      if (pipelineTrigger2) pipelineTrigger2.classList.remove("open");
+    });
+  }
+
+  if (pipelineTrigger2) {
+    pipelineTrigger2.addEventListener("click", (e) => {
+      e.stopPropagation();
+      pipelineMenuOpen2 = !pipelineMenuOpen2;
+      pipelineMenu2.classList.toggle("open", pipelineMenuOpen2);
+      pipelineTrigger2.classList.toggle("open", pipelineMenuOpen2);
+      if (pipelineMenu1) pipelineMenu1.classList.remove("open");
+      pipelineMenuOpen1 = false;
+      if (pipelineTrigger1) pipelineTrigger1.classList.remove("open");
+    });
+  }
+
   trigger.addEventListener("click", (e) => {
     e.stopPropagation();
     menuOpen = !menuOpen;
@@ -85,6 +156,12 @@ function init() {
     menuOpen = false;
     menu.classList.remove("open");
     trigger.classList.remove("open");
+    pipelineMenuOpen1 = false;
+    pipelineMenu1.classList.remove("open");
+    if (pipelineTrigger1) pipelineTrigger1.classList.remove("open");
+    pipelineMenuOpen2 = false;
+    pipelineMenu2.classList.remove("open");
+    if (pipelineTrigger2) pipelineTrigger2.classList.remove("open");
   });
 
   menu.addEventListener("click", (e) => e.stopPropagation());
@@ -118,6 +195,37 @@ function init() {
     notify();
   }
 
+  function selectPipelineModel(slot, model) {
+    if (slot === 1) {
+      pipelineModel1 = model;
+      pipelineMenu1.querySelectorAll(".dropdown-item").forEach(item => {
+        item.classList.toggle("selected", item.dataset.model === model);
+      });
+      const m = MODELS.find(x => x.model === model);
+      if (m && pipelineName1) {
+        pipelineName1.textContent = m.name;
+        if (pipelineIcon1) pipelineIcon1.innerHTML = (FAMILY_ICONS[m.family] && FAMILY_ICONS[m.family]()) || "";
+      }
+      pipelineMenuOpen1 = false;
+      pipelineMenu1.classList.remove("open");
+      if (pipelineTrigger1) pipelineTrigger1.classList.remove("open");
+    } else {
+      pipelineModel2 = model;
+      pipelineMenu2.querySelectorAll(".dropdown-item").forEach(item => {
+        item.classList.toggle("selected", item.dataset.model === model);
+      });
+      const m = MODELS.find(x => x.model === model);
+      if (m && pipelineName2) {
+        pipelineName2.textContent = m.name;
+        if (pipelineIcon2) pipelineIcon2.innerHTML = (FAMILY_ICONS[m.family] && FAMILY_ICONS[m.family]()) || "";
+      }
+      pipelineMenuOpen2 = false;
+      pipelineMenu2.classList.remove("open");
+      if (pipelineTrigger2) pipelineTrigger2.classList.remove("open");
+    }
+    notify();
+  }
+
   function renderBars(container, value) {
     if (!container) return;
     container.innerHTML = "";
@@ -136,7 +244,10 @@ function init() {
           type: "UPDATE_SETTINGS",
           model: selectedModel,
           effort: currentEffort,
-          modelEfforts: data.modelEfforts || {}
+          modelEfforts: data.modelEfforts || {},
+          pipelineEnabled: pipelineEnabled,
+          pipelineModel1: pipelineModel1,
+          pipelineModel2: pipelineModel2,
         });
       });
     });
@@ -157,20 +268,42 @@ function init() {
     });
   }
 
-  chrome.storage.local.get(["selectedModel", "selectedEffort", "activePreset", "stats"], data => {
-    if (data.selectedModel) selectedModel = data.selectedModel;
-    if (data.selectedEffort) currentEffort = data.selectedEffort;
-    if (data.activePreset) {
-      activePreset = data.activePreset;
-      document.querySelectorAll(".preset-btn").forEach(b => b.classList.toggle("active", b.dataset.preset === activePreset));
+  chrome.storage.local.get(
+    ["selectedModel", "selectedEffort", "activePreset", "stats", "pipelineEnabled", "pipelineModel1", "pipelineModel2"],
+    data => {
+      if (data.selectedModel) selectedModel = data.selectedModel;
+      if (data.selectedEffort) currentEffort = data.selectedEffort;
+      if (data.activePreset) {
+        activePreset = data.activePreset;
+        document.querySelectorAll(".preset-btn").forEach(b => b.classList.toggle("active", b.dataset.preset === activePreset));
+      }
+      if (data.pipelineEnabled !== undefined) pipelineEnabled = data.pipelineEnabled;
+      if (data.pipelineModel1) pipelineModel1 = data.pipelineModel1;
+      if (data.pipelineModel2) pipelineModel2 = data.pipelineModel2;
+      if (data.stats) {
+        if (statRequests) statRequests.textContent = data.stats.requests || 0;
+        if (statSwaps) statSwaps.textContent = data.stats.swaps || 0;
+      }
+      selectModel(selectedModel);
+      if (pipelineToggle) pipelineToggle.checked = pipelineEnabled;
+      if (pipelineModels) pipelineModels.style.display = pipelineEnabled ? "block" : "none";
+      if (pipelineName1) {
+        const m1 = MODELS.find(x => x.model === pipelineModel1);
+        if (m1) {
+          pipelineName1.textContent = m1.name;
+          if (pipelineIcon1) pipelineIcon1.innerHTML = (FAMILY_ICONS[m1.family] && FAMILY_ICONS[m1.family]()) || "";
+        }
+      }
+      if (pipelineName2) {
+        const m2 = MODELS.find(x => x.model === pipelineModel2);
+        if (m2) {
+          pipelineName2.textContent = m2.name;
+          if (pipelineIcon2) pipelineIcon2.innerHTML = (FAMILY_ICONS[m2.family] && FAMILY_ICONS[m2.family]()) || "";
+        }
+      }
+      checkStatus();
     }
-    if (data.stats) {
-      if (statRequests) statRequests.textContent = data.stats.requests || 0;
-      if (statSwaps) statSwaps.textContent = data.stats.swaps || 0;
-    }
-    selectModel(selectedModel);
-    checkStatus();
-  });
+  );
 
   if (effortGroup) {
     effortGroup.addEventListener("click", e => {
@@ -226,13 +359,29 @@ function init() {
 
   if (resetBtn) {
     resetBtn.addEventListener("click", () => {
-      chrome.storage.local.remove(["selectedModel", "selectedEffort", "modelEfforts", "activePreset"], () => {
-        currentEffort = "medium";
-        activePreset = null;
-        document.querySelectorAll(".effort-btn").forEach(b => b.classList.toggle("active", b.dataset.effort === "medium"));
-        document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
-        selectModel("almond-croissant-low");
-      });
+      chrome.storage.local.remove(
+        ["selectedModel", "selectedEffort", "modelEfforts", "activePreset", "pipelineEnabled", "pipelineModel1", "pipelineModel2"],
+        () => {
+          currentEffort = "medium";
+          activePreset = null;
+          pipelineEnabled = false;
+          pipelineModel1 = "gingerbread";
+          pipelineModel2 = "almond-croissant-low";
+          document.querySelectorAll(".effort-btn").forEach(b => b.classList.toggle("active", b.dataset.effort === "medium"));
+          document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+          if (pipelineToggle) pipelineToggle.checked = false;
+          if (pipelineModels) pipelineModels.style.display = "none";
+          selectModel("almond-croissant-low");
+          if (pipelineName1) {
+            const m1 = MODELS.find(x => x.model === pipelineModel1);
+            if (m1) pipelineName1.textContent = m1.name;
+          }
+          if (pipelineName2) {
+            const m2 = MODELS.find(x => x.model === pipelineModel2);
+            if (m2) pipelineName2.textContent = m2.name;
+          }
+        }
+      );
     });
   }
 
