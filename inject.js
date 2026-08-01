@@ -3,7 +3,7 @@
 
   let interceptedCount = 0;
   let swappedCount = 0;
-  let settings = { model: null, effort: null, modelEfforts: {} };
+  let settings = { model: null, effort: null, modelEfforts: {}, maxIntelligence: true };
 
   window.addEventListener('message', (e) => {
     if (e.source !== window) return;
@@ -11,6 +11,7 @@
       settings.model = e.data.model || null;
       settings.effort = e.data.effort || null;
       settings.modelEfforts = e.data.modelEfforts || {};
+      settings.maxIntelligence = e.data.maxIntelligence !== false;
     }
     if (e.data && e.data.type === 'NOTION_EFFORT_PING') {
       window.postMessage({
@@ -55,9 +56,20 @@
         const perModelEffort = settings.modelEfforts[activeModel];
         const targetEffort = perModelEffort || settings.effort;
 
-        if (targetEffort && configStep.value.reasoningEffort !== undefined) {
+        if (targetEffort) {
           if (configStep.value.reasoningEffort !== targetEffort) {
             configStep.value.reasoningEffort = targetEffort;
+            modified = true;
+          }
+        }
+
+        if (settings.maxIntelligence) {
+          if (configStep.value.useContextualCoreDocsAutoLoad !== true) {
+            configStep.value.useContextualCoreDocsAutoLoad = true;
+            modified = true;
+          }
+          if (configStep.value.useDocPreviewsForCoreAutoLoad !== true) {
+            configStep.value.useDocPreviewsForCoreAutoLoad = true;
             modified = true;
           }
         }

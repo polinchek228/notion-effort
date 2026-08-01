@@ -13,17 +13,19 @@ const MODELS = [
   { model: "apricot-sorbet-high", name: "Opus 4.7", family: "anthropic", efforts: ["high"], speed: 2, intelligence: 5, cost: 5 },
   { model: "ambrosia-tart-high", name: "Opus 4.8", family: "anthropic", efforts: ["low", "medium", "high", "max"], speed: 2, intelligence: 5, cost: 5 },
   { model: "acai-budino-high", name: "Fable 5", family: "anthropic", efforts: ["high"], speed: 2, intelligence: 5, cost: 5, restricted: true },
+  { model: "agave-flan", name: "Opus 5", family: "anthropic", efforts: ["low", "medium", "high", "max"], speed: 2, intelligence: 5, cost: 5 },
   { model: "anthropic-haiku-4.5", name: "Haiku 4.5", family: "anthropic", efforts: [], speed: 5, intelligence: 2, cost: 2 },
   { model: "vertex-gemini-3.5-flash", name: "Gemini 3.5 Flash", family: "gemini", efforts: ["low", "medium", "high"], speed: 5, intelligence: 3, cost: 3 },
   { model: "galette-medium-thinking", name: "Gemini 3.1 Pro", family: "gemini", efforts: ["low", "medium"], speed: 3, intelligence: 4, cost: 3 },
   { model: "gingerbread", name: "Gemini 3 Flash", family: "gemini", efforts: [], speed: 5, intelligence: 2, cost: 2 },
   { model: "xigua-mochi-medium", name: "Grok 4.3", family: "xai", efforts: ["low", "medium", "high"], speed: 3, intelligence: 5, cost: 4 },
-  { model: "strawberry-whoopiepie", name: "SpaceXAI 4.5", family: "xai", efforts: ["low", "medium", "high"], speed: 3, intelligence: 5, cost: 4 },
+  { model: "strawberry-whoopiepie", name: "Grok 4.5", family: "xai", efforts: ["low", "medium", "high"], speed: 3, intelligence: 5, cost: 4 },
   { model: "xinomavro-cake", name: "Grok Build 0.1", family: "xai", efforts: [], speed: 3, intelligence: 5, cost: 4 },
   { model: "fireworks-kimi-k2.6", name: "Kimi K2.6", family: "mystery", efforts: [], speed: 5, intelligence: 4, cost: 2 },
   { model: "fireworks-kimi-k2.7", name: "Kimi K2.7 Code", family: "mystery", efforts: [], speed: 5, intelligence: 4, cost: 2 },
-  { model: "baseten-deepseek-v4-pro", name: "DeepSeek V4 Pro", family: "mystery", efforts: [], speed: 3, intelligence: 5, cost: 4 },
-  { model: "baseten-glm-5.2", name: "GLM 5.2", family: "mystery", efforts: [], speed: 3, intelligence: 5, cost: 3 },
+  { model: "fireworks-kimi-k3", name: "Kimi K3", family: "mystery", efforts: ["low", "high", "max"], speed: 3, intelligence: 5, cost: 5 },
+  { model: "baseten-deepseek-v4-pro", name: "DeepSeek V4 Pro", family: "mystery", efforts: ["low", "medium", "high", "max"], speed: 3, intelligence: 5, cost: 4 },
+  { model: "baseten-glm-5.2", name: "GLM 5.2", family: "mystery", efforts: ["high", "max"], speed: 3, intelligence: 5, cost: 3 },
 ];
 
 function iconPath(file) { return chrome.runtime.getURL("icons/" + file); }

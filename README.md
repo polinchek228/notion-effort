@@ -8,7 +8,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white&style=for-the-badge" />
   <img src="https://img.shields.io/badge/Manifest-V3-4285F4?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Models-25-8B5CF6?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Models-27-8B5CF6?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Effort-Max-1F8F3D?style=for-the-badge" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
 </p>
@@ -22,7 +22,7 @@
 | | Функция | Описание |
 |---|---------|----------|
 | <img src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/24/solid/arrow-path.svg" width="20" height="20" /> | **Перехват запросов** | Перехватывает `POST /api/v3/runInferenceTranscript` и модифицирует payload |
-| <img src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/24/solid/cube-transparent.svg" width="20" height="20" /> | **25 моделей** | Все модели Notion AI: OpenAI, Anthropic, Gemini, xAI, Mystery |
+| <img src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/24/solid/cube-transparent.svg" width="20" height="20" /> | **27 моделей** | Все модели Notion AI: OpenAI, Anthropic, Gemini, xAI, Mystery |
 | <img src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/24/solid/bolt.svg" width="20" height="20" /> | **4 уровня усилий** | Low → Medium → High → Max для моделей с поддержкой |
 | <img src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/24/solid/chart-bar.svg" width="20" height="20" /> | **Статистика** | Счётчик перехваченных и подменённых запросов в реальном времени |
 | <img src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/24/solid/cog-6-tooth.svg" width="20" height="20" /> | **Минималистичный UI** | Тёмная тема, выбор модели через dropdown, effort через кнопки |
@@ -67,6 +67,7 @@ git clone https://github.com/polinchek228/notion-effort.git
 | `apricot-sorbet-high` | Opus 4.7 | Anthropic | high |
 | `ambrosia-tart-high` | Opus 4.8 | Anthropic | low / medium / high / max |
 | `acai-budino-high` | Fable 5 | Anthropic | high (🔒 restricted) |
+| `agave-flan` | Opus 5 | Anthropic | low / medium / high / max |
 | `orange-mousse` | GPT-5.6 Sol | OpenAI | medium / high |
 | `orchid-muffin` | GPT-5.6 Terra | OpenAI | medium / high |
 | `olive-jellyroll` | GPT-5.6 Luna | OpenAI | medium / high |
@@ -76,11 +77,12 @@ git clone https://github.com/polinchek228/notion-effort.git
 | `vertex-gemini-3.5-flash` | Gemini 3.5 Flash | Gemini | low / medium / high |
 | `galette-medium-thinking` | Gemini 3.1 Pro | Gemini | low / medium |
 | `xigua-mochi-medium` | Grok 4.3 | xAI | low / medium / high |
-| `strawberry-whoopiepie` | SpaceXAI 4.5 | xAI | low / medium / high |
+| `strawberry-whoopiepie` | Grok 4.5 | xAI | low / medium / high |
 | `fireworks-kimi-k2.6` | Kimi K2.6 | Mystery | — |
 | `fireworks-kimi-k2.7` | Kimi K2.7 Code | Mystery | — |
-| `baseten-deepseek-v4-pro` | DeepSeek V4 Pro | Mystery | — |
-| `baseten-glm-5.2` | GLM 5.2 | Mystery | — |
+| `fireworks-kimi-k3` | Kimi K3 | Mystery | low / high / max |
+| `baseten-deepseek-v4-pro` | DeepSeek V4 Pro | Mystery | low / medium / high / max |
+| `baseten-glm-5.2` | GLM 5.2 | Mystery | high / max |
 
 ---
 
