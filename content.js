@@ -15,7 +15,7 @@
 
   function loadAndSendSettings() {
     chrome.storage.local.get(
-      ["selectedModel", "selectedEffort", "modelEfforts", "pipelineEnabled", "pipelineModel1", "pipelineModel2"],
+      ["selectedModel", "selectedEffort", "modelEfforts", "pipelineEnabled", "pipelineModel1", "pipelineModel2", "pipelineModel1Effort", "pipelineModel2Effort"],
       (data) => {
         window.postMessage({
           type: 'NOTION_EFFORT_SETTINGS',
@@ -25,6 +25,8 @@
           pipelineEnabled: data.pipelineEnabled || false,
           pipelineModel1: data.pipelineModel1 || null,
           pipelineModel2: data.pipelineModel2 || null,
+          pipelineModel1Effort: data.pipelineModel1Effort || null,
+          pipelineModel2Effort: data.pipelineModel2Effort || null,
         }, '*');
       }
     );
@@ -46,6 +48,8 @@
         pipelineEnabled: msg.pipelineEnabled || false,
         pipelineModel1: msg.pipelineModel1 || null,
         pipelineModel2: msg.pipelineModel2 || null,
+        pipelineModel1Effort: msg.pipelineModel1Effort || null,
+        pipelineModel2Effort: msg.pipelineModel2Effort || null,
       }, '*');
       sendResponse({ ok: true });
       return true;

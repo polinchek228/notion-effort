@@ -3,15 +3,17 @@
 
   let interceptedCount = 0;
   let swappedCount = 0;
-  let settings = {
-    model: null,
-    effort: null,
-    modelEfforts: {},
-    maxIntelligence: true,
-    pipelineEnabled: false,
-    pipelineModel1: null,
-    pipelineModel2: null,
-  };
+let settings = {
+  model: null,
+  effort: null,
+  modelEfforts: {},
+  maxIntelligence: true,
+  pipelineEnabled: false,
+  pipelineModel1: null,
+  pipelineModel2: null,
+  pipelineModel1Effort: null,
+  pipelineModel2Effort: null,
+};
 
   window.addEventListener('message', (e) => {
     if (e.source !== window) return;
@@ -23,6 +25,8 @@
       settings.pipelineEnabled = e.data.pipelineEnabled || false;
       settings.pipelineModel1 = e.data.pipelineModel1 || null;
       settings.pipelineModel2 = e.data.pipelineModel2 || null;
+      settings.pipelineModel1Effort = e.data.pipelineModel1Effort || null;
+      settings.pipelineModel2Effort = e.data.pipelineModel2Effort || null;
     }
     if (e.data && e.data.type === 'NOTION_EFFORT_PING') {
       window.postMessage({
@@ -112,6 +116,9 @@
         const config1 = pipelineBody1.transcript.find((s) => s.type === 'config');
         if (config1 && config1.value) {
           config1.value.model = settings.pipelineModel1;
+          if (settings.pipelineModel1Effort) {
+            config1.value.reasoningEffort = settings.pipelineModel1Effort;
+          }
           if (settings.maxIntelligence) {
             config1.value.useContextualCoreDocsAutoLoad = true;
             config1.value.useDocPreviewsForCoreAutoLoad = true;
@@ -142,8 +149,8 @@
 
           const pipelineBody2 = buildPipelineBody(body, model1Text, settings.pipelineModel2);
           const config2 = pipelineBody2.transcript.find((s) => s.type === 'config');
-          if (config2 && config2.value && settings.effort) {
-            config2.value.reasoningEffort = settings.effort;
+          if (config2 && config2.value && settings.pipelineModel2Effort) {
+            config2.value.reasoningEffort = settings.pipelineModel2Effort;
           }
 
           swappedCount++;

@@ -236,22 +236,30 @@ function init() {
     }
   }
 
-  function notify() {
-    chrome.storage.local.get(["modelEfforts"], (data) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        if (!tabs[0]) return;
-        chrome.tabs.sendMessage(tabs[0].id, {
-          type: "UPDATE_SETTINGS",
-          model: selectedModel,
-          effort: currentEffort,
-          modelEfforts: data.modelEfforts || {},
-          pipelineEnabled: pipelineEnabled,
-          pipelineModel1: pipelineModel1,
-          pipelineModel2: pipelineModel2,
-        });
+  function getMaxEffort(modelId) {
+  const m = MODELS.find((x) => x.model === modelId);
+  if (!m || m.efforts.length === 0) return null;
+  return m.efforts[m.efforts.length - 1];
+}
+
+function notify() {
+  chrome.storage.local.get(["modelEfforts"], (data) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      if (!tabs[0]) return;
+      chrome.tabs.sendMessage(tabs[0].id, {
+        type: "UPDATE_SETTINGS",
+        model: selectedModel,
+        effort: currentEffort,
+        modelEfforts: data.modelEfforts || {},
+        pipelineEnabled: pipelineEnabled,
+        pipelineModel1: pipelineModel1,
+        pipelineModel2: pipelineModel2,
+        pipelineModel1Effort: getMaxEffort(pipelineModel1),
+        pipelineModel2Effort: getMaxEffort(pipelineModel2),
       });
     });
-  }
+  });
+}
 
   function checkStatus() {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
